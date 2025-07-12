@@ -137,7 +137,7 @@ def start_monitor():
     print("🚀 Starting Firebase monitoring for stress prediction...")
     threading.Thread(target=monitor_firebase_sensor_data, daemon=True).start()
 
-# --- Health Check Endpoint ---
+# --- Health Check Endpoints ---
 @app.get("/health")
 def health_check():
     try:
@@ -156,6 +156,11 @@ def health_check():
             "error": str(e),
             "timestamp": datetime.now().isoformat()
         }
+
+@app.get("/healthz/ready")
+def readiness_check():
+    # Minimal endpoint for platform readiness probes
+    return {"status": "ready"}
 
 # --- Manual Trigger Endpoint ---
 @app.post("/trigger-prediction")
@@ -176,7 +181,3 @@ def trigger_prediction():
             return {"status": "error", "message": "No sensor data found"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
